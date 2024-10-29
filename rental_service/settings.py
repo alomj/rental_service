@@ -1,4 +1,4 @@
-
+import dj_database_url
 import os
 from pathlib import Path
 
@@ -58,9 +58,16 @@ WSGI_APPLICATION = 'rental_service.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+import dj_database_url
+import os
+
 DATABASES = {
     'default': {
+        **dj_database_url.config(default=os.getenv('DATABASE_URL')),
         'ENGINE': 'django.db.backends.postgresql',
+        'OPTIONS': {
+            'driver': 'psycopg',
+        },
         'NAME': os.getenv('DATABASE_NAME'),
         'USER': os.getenv('DATABASE_USER'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
@@ -68,6 +75,7 @@ DATABASES = {
         'PORT': os.getenv('DATABASE_PORT'),
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
