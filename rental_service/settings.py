@@ -22,6 +22,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'user',
     'rest_framework',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+
 ]
 
 MIDDLEWARE = [
@@ -62,18 +65,7 @@ import dj_database_url
 import os
 
 DATABASES = {
-    'default': {
-        **dj_database_url.config(default=os.getenv('DATABASE_URL')),
-        'ENGINE': 'django.db.backends.postgresql',
-        'OPTIONS': {
-            'driver': 'psycopg',
-        },
-        'NAME': os.getenv('DATABASE_NAME'),
-        'USER': os.getenv('DATABASE_USER'),
-        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST': os.getenv('DATABASE_HOST'),
-        'PORT': os.getenv('DATABASE_PORT'),
-    }
+    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 }
 
 
@@ -115,3 +107,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'user',
+    'JWT_AUTH_REFRESH_COOKIE': 'user'
+}
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    )
+}
