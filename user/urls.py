@@ -1,5 +1,11 @@
-from dj_rest_auth.views import LoginView
-from rental_service.urls import path
+
+from django.urls import path, include
+from .views import get_notes, CustomTokenObtainView, CustomRefreshTokenView, logout, is_authenticated, register
 urlpatterns = [
-    path('login/', LoginView.as_view(), name='login'),
+    path('token/', CustomTokenObtainView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', CustomRefreshTokenView.as_view(), name='token_refresh'),
+    path('notes/', get_notes),
+    path ('logout/', logout, ),
+    path ('authenticated/', is_authenticated),
+    path ('register/' , register),
 ]
