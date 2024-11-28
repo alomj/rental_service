@@ -8,7 +8,7 @@ from .serializer import NotesSerializer, UserRegistrationSerializer
 
 
 class CustomTokenObtainView(TokenObtainPairView):
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):   
         try:
             response = super().post(request, *args, **kwargs)
             token = response.data

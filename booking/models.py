@@ -49,7 +49,7 @@ class BookingStatus(models.TextChoices):
 
 class Booking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
     status = models.CharField(
         max_length=10,
         choices=BookingStatus.choices,

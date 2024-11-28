@@ -5,7 +5,7 @@ from django.db import models
 class User(AbstractUser):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(null=True, blank=True)
     avatar = models.ImageField(upload_to='avatars/')
     email = models.EmailField(unique=True)
     groups = models.ManyToManyField(Group, related_name="custom_user_groups", blank=True)

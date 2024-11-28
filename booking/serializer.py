@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from user.models import User
 from .models import Hotel, Flight, Car, Booking
 
 
@@ -28,8 +29,23 @@ class BookingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Booking
-        fields = ['created_at', 'created_by', 'status', 'hotel', 'car', 'flight', 'hotel_details', 'car_details',
-                  'flight_details']
+        fields = [
+            'created_at', 'created_by', 'status',
+            'hotel', 'car', 'flight',
+            'hotel_details', 'car_details', 'flight_details'
+        ]
+        read_only_fields = ['created_by', 'created_at']
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        if not request or not request.user or not request.user.is_authenticated:
+            raise serializers.ValidationError("User must be authenticated to create a booking.")
+
+        if not isinstance(request.user, User):  # Перевірка, чи це екземпляр User
+            raise serializers.ValidationError("Invalid user instance.")
+
+        validated_data['created_by'] = request.user
+        return super().create(validated_data)
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
