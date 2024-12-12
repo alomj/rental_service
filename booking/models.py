@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import ForeignKey
 
 from user.models import User
 
@@ -14,7 +15,7 @@ class Hotel(models.Model):
     number_of_guests = models.IntegerField()
     is_breakfast_included = models.BooleanField(default=False)
     special_requests = models.TextField(null=True, blank=True)
-
+    image = models.ImageField(upload_to='hotels/', blank=True, null=False, default='images/default-hotel.jpg')
 
 class Car(models.Model):
     make = models.CharField(max_length=100)
@@ -27,6 +28,7 @@ class Car(models.Model):
     is_insurance_included = models.BooleanField(default=False)
     mileage_limit = models.IntegerField(null=True, blank=True)
     special_requirements = models.TextField(null=True, blank=True)
+    image = models.ImageField(upload_to='cars/', blank=True, null=False, default='images/default-car.jpg')
 
 
 class Flight(models.Model):
@@ -40,6 +42,17 @@ class Flight(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     seat_class = models.CharField(max_length=50)
     is_direct = models.BooleanField(default=True)
+    image = models.ImageField(upload_to='flights/', blank=True, null=False, default='images/default-flight.jpg')
+
+class Ticket(models.Model):
+    flight = ForeignKey(Flight, on_delete=models.CASCADE)
+    passenger_name = models.CharField(max_length=255)
+    email = models.EmailField()
+    purchase_data = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Ticket for {self.passenger_name} on {self.flight}'
+
 
 
 class BookingStatus(models.TextChoices):

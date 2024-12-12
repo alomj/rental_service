@@ -1,0 +1,46 @@
+{% extends "user/base.html" %}
+{% load static %}
+
+{% block title %}Buy Ticket{% endblock %}
+
+{% block content %}
+    <div class="bg-white p-6 rounded-lg shadow-md mt-6">
+        <h1 class="text-3xl font-bold mb-4">Buy Ticket</h1>
+
+        <div class="border-b mb-4 pb-4">
+            <h2 class="text-xl font-semibold mb-2">Flight Details</h2>
+            <p class="text-gray-600"><strong>Flight:</strong> {{ flight.airline }} - {{ flight.flight_number }}</p>
+            <p class="text-gray-600"><strong>Departure:</strong> {{ flight.place_of_departure }}
+                at {{ flight.departure_time }}</p>
+            <p class="text-gray-600"><strong>Destination:</strong> {{ flight.destination }} at {{ flight.arrival_time }}
+            </p>
+            <p class="text-gray-600"><strong>Date:</strong> {{ flight.date_of_departure }}</p>
+            <p class="text-gray-600"><strong>Price:</strong> ${{ flight.price }}</p>
+        </div>
+
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+                <div class="mb-4">
+                    <label for="{{ field.id_for_label }}"
+                           class="block text-gray-700 font-semibold mb-1">{{ field.label }}</label>
+
+                    {{ field.errors }}
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <p class="text-sm text-gray-500">{{ field.help_text }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div class="flex justify-end">
+                <button type="submit" class="px-6 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700">
+                    Buy Ticket
+                </button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

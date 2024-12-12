@@ -1,10 +1,76 @@
-from django.contrib.auth import get_user_model
+import requests
+from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.template.loader import render_to_string
+from django.views.generic import TemplateView
+from weasyprint import HTML
+from django.contrib.auth.decorators import login_required
+from .forms import BuyTicketForm
+from .models import Flight, Ticket
+
+
+@login_required
+def flight_list(request):
+    flights = Flight.objects.all()
+    return render(request, 'booking/flight/flight_list.html', {'flights': flights})
+
+def show_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+    return render(request, 'booking/flight/success_ticket.html', {'ticket': ticket})
+
+
+
+def success_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+    html_content = render_to_string('booking/flight/ticket_template.html', {'ticket': ticket})
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="ticket_{ticket.id}.pdf"'
+
+    HTML(string=html_content).write_pdf(response)
+    return response
+
+
+def ticket_buy(request, flight_id):
+    flight = get_object_or_404(Flight, id=flight_id)
+    if request.method == "POST":
+        form = BuyTicketForm(request.POST)
+        if form.is_valid():
+            ticket = form.save(commit=False)
+            ticket.flight = flight
+            ticket.save()
+            return redirect('show_ticket', ticket_id=ticket.id)
+    else:
+        form = BuyTicketForm()
+    return render(request, 'booking/flight/buy_ticket.html', {'flight': flight, 'form': form})
+
+
+class BookingRenderList(TemplateView):
+    template_name = "booking/order_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        try:
+            response = requests.get("http://localhost:8000/api/bookings/")
+            if response.status_code == 200:
+                context['bookings'] = response.json()
+            else:
+                print(f"Несподіваний статус відповіді: {response.status_code}")
+                context['bookings'] = []  # Якщо статус не 200
+        except requests.RequestException as e:
+            print(f"API request failed: {e}")
+            context['bookings'] = []
+
+        return context
+
+
+from django.contrib.auth import get_user_model, login
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import AllowAny
-from rest_framework.renderers import JSONRenderer
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from booking.models import Booking, BookingStatus
@@ -20,12 +86,11 @@ class BookingFilter(filters.FilterSet):
 
 
 class BookingViewSet(viewsets.ModelViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['status', 'created_at', 'hotel', 'car', 'flight']
-    renderer_classes = [JSONRenderer]
 
     def get_queryset(self):
         user = self.request.user

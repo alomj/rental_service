@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Notes
+from .models import User
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -8,8 +8,4 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = ('is_staff', 'is_active')
     readonly_fields = ('date_joined', 'last_login')
 
-@admin.register(Notes)
-class NotesAdmin(admin.ModelAdmin):
-    list_display = ('description', 'owner')
-    search_fields = ('description', 'owner__username')
-    list_filter = ('owner',)
+

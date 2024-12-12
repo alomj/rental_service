@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Ticket</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="max-w-lg mx-auto bg-white border rounded-lg shadow-lg p-6">
+        <!-- Header -->
+        <div class="text-center border-b pb-4">
+            <h1 class="text-2xl font-bold text-gray-700">Flight Ticket</h1>
+            <p class="text-gray-500">Thank you for booking with us!</p>
+        </div>
+
+        <!-- Ticket Details -->
+        <div class="mt-4 space-y-3">
+            <p class="text-gray-700">
+                <span class="font-semibold text-gray-900">Passenger Name:</span> {{ ticket.passenger_name }}
+            </p>
+            <p class="text-gray-700">
+                <span class="font-semibold text-gray-900">Email:</span> {{ ticket.email }}
+            </p>
+            <p class="text-gray-700">
+                <span class="font-semibold text-gray-900">Flight:</span> {{ ticket.flight.airline }} - {{ ticket.flight.flight_number }}
+            </p>
+            <p class="text-gray-700">
+                <span class="font-semibold text-gray-900">Departure:</span> {{ ticket.flight.place_of_departure }} at {{ ticket.flight.departure_time }}
+            </p>
+            <p class="text-gray-700">
+                <span class="font-semibold text-gray-900">Arrival:</span> {{ ticket.flight.destination }} at {{ ticket.flight.arrival_time }}
+            </p>
+            <p class="text-gray-700">
+                <span class="font-semibold text-gray-900">Seat Class:</span> {{ ticket.flight.seat_class }}
+            </p>
+            <p class="text-gray-700">
+                <span class="font-semibold text-gray-900">Price:</span> ${{ ticket.flight.price }}
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 border-t pt-4 text-center">
+            <p class="text-gray-500 text-sm">Ticket ID: {{ ticket.id }}</p>
+            <a href="{% url 'success_ticket' ticket.id %}" class="mt-4 inline-block bg-red-500 text-white font-medium px-4 py-2 rounded shadow hover:bg-red-600">
+                Download Ticket
+            </a>
+        </div>
+    </div>
+</body>
+</html>

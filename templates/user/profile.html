@@ -1,0 +1,53 @@
+{% extends "user/base.html" %}
+{% load static %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-md mt-6">
+    <h1 class="text-3xl font-bold mb-4">My Profile</h1>
+    <div class="flex items-center mb-4">
+       
+        <div class="w-20 h-20 rounded-full bg-gray-300 mr-4 overflow-hidden">
+            {% if user.avatar %}
+                <img src="{{ user.avatar.url }}" alt="Avatar of {{ user.username }}" class="w-20 h-20 object-cover">
+            {% else %}
+                <img src="{% static 'images/default-avatar.jpg' %}" alt="Default avatar" class="w-20 h-20 object-cover">
+            {% endif %}
+        </div>
+        
+        <div>
+            <h3 class="text-lg font-semibold">{{ user.username }}</h3>
+            <h3 class="text-gray-600">{{ user.email }}</h3>
+            {% if user.first_name or user.last_name %}
+                <h3 class="text-gray-600">{{ user.first_name }} {{ user.last_name }}</h3>
+            {% endif %}
+            {% if user.date_of_birth %}
+                <h3 class="text-gray-600">Date of Birth: {{ user.date_of_birth }}</h3>
+            {% endif %}
+        </div>
+    </div>
+    <div class="border-t mt-4 pt-4">
+      
+        <h2 class="text-2xl font-bold mb-3">Booking History</h2>
+        {% if bookings %}
+            <ul class="space-y-4">
+                {% for booking in bookings %}
+                    <li class="border-b pb-3">
+                        <p class="font-semibold">Booking ID: {{ booking.id }}</p>
+                        <p class="text-gray-600">Date: {{ booking.date }}</p>
+                        <p class="text-gray-600">Details: {{ booking.details }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-600">You have no bookings yet.</p>
+        {% endif %}
+    </div>
+</div>
+<div class="flex justify-end">
+    <a href="{% url 'edit_profile' %}" class="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 inline-block">
+        Edit Profile
+    </a>
+</div>
+{% endblock %}

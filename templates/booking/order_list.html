@@ -1,0 +1,29 @@
+{% extends "user/base.html" %}
+{% block title %}Bookings{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-md mt-6">
+    <h1 class="text-3xl font-bold mb-4">Booking List</h1>
+    {% if bookings %}
+        <ul class="space-y-4">
+            {% for booking in bookings %}
+                <li class="border-b pb-3">
+                    <p class="font-semibold">Booking ID: {{ booking.id }}</p>
+                    <p class="text-gray-600">Date: {{ booking.date }}</p>
+                    <p class="text-gray-600">Details: {{ booking.details }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-gray-600">No bookings available.</p>
+    {% endif %}
+</div>
+<div class="flex justify-end mt-6">
+    <a href="?reloaded=true" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 inline-block">
+        Reload Data
+    </a>
+</div>
+{% if reloaded %}
+    <p class="text-green-600 mt-4">Data reloaded successfully!</p>
+{% endif %}
+{% endblock %}
