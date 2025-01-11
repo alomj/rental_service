@@ -1,0 +1,61 @@
+{% extends "user/base.html" %}
+{% load static %}
+{% block title %}Car List{% endblock %}
+
+{% block content %}
+    <div class="bg-white p-6 rounded-lg shadow-md mt-6">
+        <h1 class="text-3xl font-bold mb-4">Car List</h1>
+
+        {% if cars %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for car in cars %}
+                    <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+                        {% if car.image %}
+                            <img src="{{ car.image.url }}" alt="Image of car {{ car.model }}"
+                                 class="w-full h-40 object-cover">
+                        {% else %}
+                            <img src="{% static 'images/default-car.jpg' %}" alt="Default car image"
+                                 class="w-full h-40 object-cover">
+                        {% endif %}
+
+                        <div class="p-4">
+                            <h2 class="text-xl font-bold mb-2">{{ car.model }} ({{ car.year }})</h2>
+                            <p class="text-gray-700 mb-2">
+                                <strong>Price per Day:</strong> ${{ car.price_per_day }}
+                            </p>
+                            <p class="text-gray-700 mb-2">
+                                <strong>Total Price:</strong> ${{ car.total_price }}
+                            </p>
+                            <p class="text-gray-700 mb-4">
+                                {% if car.is_insurance_included %}
+                                    <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Insurance Included</span>
+                                {% else %}
+                                    <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">No Insurance</span>
+                                {% endif %}
+                            </p>
+
+                            {% if car.mileage_limit %}
+                                <p class="text-gray-700 mb-4">
+                                    <strong>Mileage Limit:</strong> {{ car.mileage_limit }} km
+                                </p>
+                            {% endif %}
+
+                            {% if car.special_requirements %}
+                                <p class="text-gray-700 mb-4">
+                                    <strong>Special Requirements:</strong> {{ car.special_requirements }}
+                                </p>
+                            {% endif %}
+                            <p>Car ID: {{ car.id }}</p> <!-- Перевіряємо, чи є ID -->
+                            <a href="{% url 'car_rent' car.id %}"
+                               class="w-full inline-block text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                Rent {{ car.model }}
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-gray-700">No available cars.</p>
+        {% endif %}
+    </div>
+{% endblock %}

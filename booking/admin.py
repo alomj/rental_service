@@ -4,7 +4,7 @@ from .models import Booking, Hotel, Car, Flight
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
     list_display = ('created_at', 'created_by', 'status', 'hotel', 'car', 'flight')
-    search_fields = ('created_by__username', 'hotel__name', 'car__make', 'flight__flight_number')
+    search_fields = ('created_by__username', 'hotel__name','flight__flight_number')
     list_filter = ('status', 'hotel', 'car', 'flight')
 
 @admin.register(Hotel)
@@ -14,8 +14,8 @@ class HotelAdmin(admin.ModelAdmin):
 
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
-    list_display = ('make', 'model', 'year', 'rental_start_date', 'rental_end_date')
-    search_fields = ('make', 'model')
+    list_display = ('model', )
+    search_fields = ['model']
 
 
 from django.contrib import admin

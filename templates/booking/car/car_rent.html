@@ -1,0 +1,87 @@
+{% extends "user/base.html" %}
+{% load static %}
+{% block title %}Car Details{% endblock %}
+
+{% block content %}
+    <div class="bg-white p-6 rounded-lg shadow-md mt-6">
+        <h1 class="text-3xl font-bold mb-4">Car Details</h1>
+
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden flex">
+            <div class="w-1/3 p-4">
+                {% if car.image %}
+                    <img src="{{ car.image.url }}" alt="Image of car {{ car.model }}" class="w-full h-auto object-contain">
+                {% else %}
+                    <img src="{% static 'images/default-car.jpg' %}" alt="Default car image"
+                         class="w-full h-auto object-contain">
+                {% endif %}
+            </div>
+
+            <div class="p-6 w-2/3">
+                <h2 class="text-2xl font-bold mb-4">{{ car.model }} ({{ car.year }})</h2>
+
+                <p class="text-gray-700 mb-2">
+                    <strong>Class:</strong> {{ car.get_class_of_car_display }}
+                </p>
+                <p class="text-gray-700 mb-2">
+                    <strong>Price per day:</strong> ${{ car.price_per_day }}
+                </p>
+                <p class="text-gray-700 mb-2">
+                    <strong>Insurance Included:</strong>
+                    {% if car.is_insurance_included %}
+                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Yes</span>
+                    {% else %}
+                        <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">No</span>
+                    {% endif %}
+                </p>
+
+                {% if car.mileage_limit %}
+                    <p class="text-gray-700 mb-2">
+                        <strong>Mileage Limit:</strong> {{ car.mileage_limit }} km
+                    </p>
+                {% endif %}
+
+                {% if car.special_requirements %}
+                    <p class="text-gray-700 mb-4">
+                        <strong>Special Requirements:</strong> {{ car.special_requirements }}
+                    </p>
+                {% endif %}
+
+                <h3 class="text-lg font-semibold mb-2">Rental Dates</h3>
+            
+                <h3 class="text-lg font-semibold mb-4">Is this car being rented right now?</h3>
+                <p class="mb-6">
+                    {% if car.is_renter_now %}
+                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">Yes</span>
+                    {% else %}
+                        <span class="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded">No</span>
+                    {% endif %}
+                </p>
+
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+
+                    {% for field in form %}
+                        <div>
+                            <label for="{{ field.id_for_label }}"
+                                   class="block text-gray-700 font-semibold mb-1">{{ field.label }}</label>
+
+                            {{ field.errors }}
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <p class="text-sm text-gray-500">{{ field.help_text }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="flex justify-end">
+                        <button type="submit"
+                                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            Rent {{ car.model }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
