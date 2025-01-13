@@ -4,7 +4,19 @@
 
 {% block content %}
     <div class="bg-white p-6 rounded-lg shadow-md mt-6">
-        <h1 class="text-3xl font-bold mb-4">Car List</h1>
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-3xl font-bold">Car List</h1>
+            <form method="get" action="{% url 'car_list' %}" class="flex items-center space-x-2">
+                <input
+                        type="text"
+                        name="q"
+                        placeholder="Search car..."
+                        class="border px-4 py-2 rounded"
+                        value="{% if query.strip %}{{ query }}{% else %}{% endif %}">
+
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
+            </form>
+        </div>
 
         {% if cars %}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -22,9 +34,6 @@
                             <h2 class="text-xl font-bold mb-2">{{ car.model }} ({{ car.year }})</h2>
                             <p class="text-gray-700 mb-2">
                                 <strong>Price per Day:</strong> ${{ car.price_per_day }}
-                            </p>
-                            <p class="text-gray-700 mb-2">
-                                <strong>Total Price:</strong> ${{ car.total_price }}
                             </p>
                             <p class="text-gray-700 mb-4">
                                 {% if car.is_insurance_included %}
@@ -45,14 +54,42 @@
                                     <strong>Special Requirements:</strong> {{ car.special_requirements }}
                                 </p>
                             {% endif %}
-                            <p>Car ID: {{ car.id }}</p> <!-- Перевіряємо, чи є ID -->
-                            <a href="{% url 'car_rent' car.id %}"
+                            <p>Car ID: {{ car.slug }}</p>
+                            <a href="{% url 'car_rent' car.slug %}"
                                class="w-full inline-block text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                                 Rent {{ car.model }}
                             </a>
                         </div>
                     </div>
                 {% endfor %}
+            </div>
+            <div class="mt-6">
+                <nav class="flex justify-center items-center space-x-2">
+                    {% if cars.has_previous %}
+                        <a href="?page={{ cars.previous_page_number }}"
+                           class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                            Previous
+                        </a>
+                    {% endif %}
+
+                    {% for page_num in cars.paginator.page_range %}
+                        {% if page_num == cars.number %}
+                            <span class="px-4 py-2 bg-blue-600 text-white rounded">{{ page_num }}</span>
+                        {% else %}
+                            <a href="?page={{ page_num }}"
+                               class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                                {{ page_num }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if cars.has_next %}
+                        <a href="?page={{ cars.next_page_number }}"
+                           class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                            Next
+                        </a>
+                    {% endif %}
+                </nav>
             </div>
         {% else %}
             <p class="text-gray-700">No available cars.</p>

@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import ForeignKey
+from django.utils.text import slugify
 
 from user.models import User
 
@@ -42,10 +43,16 @@ class Car(models.Model):
     mileage_limit = models.IntegerField(null=True, blank=True)
     special_requirements = models.TextField(null=True, blank=True)
     image = models.ImageField(upload_to='cars/', blank=True, null=False, default='images/default-car.jpg')
+    slug = models.CharField(unique=True , max_length=300)
 
     def is_renter_now(self):
         today=date.today()
         return self.rentals.filter(rental_start_date__lte=today, rental_end_date__gte=today).exists()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f'{self.model}-{self.year} made')
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.model} ({self.year}) - {self.get_class_of_car_display()} {self.id}  {self.price_per_day}"
@@ -87,8 +94,13 @@ class Flight(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     seat_class = models.CharField(max_length=50)
     is_direct = models.BooleanField(default=True)
+    slug = models.SlugField(unique=True)
     image = models.ImageField(upload_to='flights/', blank=True, null=False, default='images/default-flight.jpg')
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            slug = slugify(f"{self.airline}-{self.flight_number}")
+        super().save(*args, **kwargs)
 
 class Ticket(models.Model):
     flight = ForeignKey(Flight, on_delete=models.CASCADE)

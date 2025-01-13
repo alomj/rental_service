@@ -40,7 +40,7 @@
         
         <div class="mt-6 border-t pt-4 text-center">
             <p class="text-gray-500 text-sm">Ticket ID: {{ ticket.id }}</p>
-            <a href="{% url 'ticket_pdf' ticket.id %}" class="mt-4 inline-block bg-red-500 text-white font-medium px-4 py-2 rounded shadow hover:bg-red-600">
+            <a href="{% url 'ticket_pdf' flight.slug ticket.id %}" class="mt-4 inline-block bg-red-500 text-white font-medium px-4 py-2 rounded shadow hover:bg-red-600">
                 Download Ticket
             </a>
             
