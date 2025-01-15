@@ -41,7 +41,7 @@ class BookingSerializer(serializers.ModelSerializer):
         if not request or not request.user or not request.user.is_authenticated:
             raise serializers.ValidationError("User must be authenticated to create a booking.")
 
-        if not isinstance(request.user, User):  # Перевірка, чи це екземпляр User
+        if not isinstance(request.user, User):
             raise serializers.ValidationError("Invalid user instance.")
 
         validated_data['created_by'] = request.user

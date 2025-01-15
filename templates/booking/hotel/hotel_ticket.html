@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Booking Confirmation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<div class="max-w-lg mx-auto bg-white border rounded-lg shadow-lg p-6">
+    <div class="text-center border-b pb-4">
+        <h1 class="text-2xl font-bold text-gray-700">Hotel Booking Confirmation</h1>
+        <p class="text-gray-500">Thank you for booking with us!</p>
+    </div>
+
+    <div class="mt-4 space-y-3">
+        <p class="text-gray-700">
+            <span class="font-semibold text-gray-900">Hotel Name:</span> {{ hotel.name }}
+        </p>
+        <p class="text-gray-700">
+            <span class="font-semibold text-gray-900">Location:</span> {{ hotel.location }}
+        </p>
+        <p class="text-gray-700">
+            <span class="font-semibold text-gray-900">Room Type:</span> {{ hotel.room_type }}
+        </p>
+        <p class="text-gray-700">
+            <span class="font-semibold text-gray-900">Breakfast Included:</span> {{ hotel.is_breakfast_included|yesno:"Yes,No" }}
+        </p>
+        <p class="text-gray-700">
+            <span class="font-semibold text-gray-900">Booking Period:</span> From {{ hotel.date_of_arrival }} to {{ hotel.departure_date }}
+        </p>
+        <p class="text-gray-700">
+            <span class="font-semibold text-gray-900">Total Price:</span> ${{ total_price }}
+        </p>
+    </div>
+
+    <div class="mt-6 border-t pt-4 text-center">
+        <p class="text-gray-500 text-sm">Booking ID: {{ hotel.id }}</p>
+        <a href="{% url 'hotel_list' %}"
+           class="mt-4 inline-block bg-blue-500 text-white font-medium px-4 py-2 rounded shadow hover:bg-blue-600">
+            <i class="fas fa-hotel mr-2"></i> View More Hotels
+        </a>
+
+        <a href="{% url 'home' %}"
+           class="mt-4 inline-block bg-green-500 text-white font-medium px-4 py-2 rounded shadow hover:bg-green-600">
+            <i class="fas fa-home mr-2"></i> Home
+        </a>
+    </div>
+</div>
+</body>
+</html>

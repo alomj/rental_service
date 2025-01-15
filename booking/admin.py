@@ -9,7 +9,7 @@ class BookingAdmin(admin.ModelAdmin):
 
 @admin.register(Hotel)
 class HotelAdmin(admin.ModelAdmin):
-    list_display = ('name', 'location', 'date_of_arrival', 'departure_date', 'room_type')
+    list_display = ('name', 'location', 'room_type')
     search_fields = ('name', 'location')
 
 @admin.register(Car)

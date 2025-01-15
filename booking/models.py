@@ -1,3 +1,5 @@
+from datetime import date, datetime
+
 from django.db import models
 from django.db.models import ForeignKey
 from django.utils.text import slugify
@@ -8,18 +10,17 @@ from user.models import User
 class Hotel(models.Model):
     name = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
-    date_of_arrival = models.DateField()
-    departure_date = models.DateField()
     room_type = models.CharField(max_length=100)
     price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2)
-    number_of_guests = models.IntegerField()
     is_breakfast_included = models.BooleanField(default=False)
     special_requests = models.TextField(null=True, blank=True)
     image = models.ImageField(upload_to='hotels/', blank=True, null=False, default='images/default-hotel.jpg')
+    slug = models.SlugField(unique=True, blank=True, null=True)
 
-
-from datetime import date, datetime
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f'{self.name} at {self.location}')
+        super().save(*args, **kwargs)
 
 
 class Car(models.Model):
@@ -43,10 +44,10 @@ class Car(models.Model):
     mileage_limit = models.IntegerField(null=True, blank=True)
     special_requirements = models.TextField(null=True, blank=True)
     image = models.ImageField(upload_to='cars/', blank=True, null=False, default='images/default-car.jpg')
-    slug = models.CharField(unique=True , max_length=300)
+    slug = models.CharField(unique=True, max_length=300)
 
     def is_renter_now(self):
-        today=date.today()
+        today = date.today()
         return self.rentals.filter(rental_start_date__lte=today, rental_end_date__gte=today).exists()
 
     def save(self, *args, **kwargs):
@@ -58,10 +59,11 @@ class Car(models.Model):
         return f"{self.model} ({self.year}) - {self.get_class_of_car_display()} {self.id}  {self.price_per_day}"
 
 
-
 class Rental(models.Model):
-    car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='rentals')
+    car = models.ForeignKey(Car, on_delete=models.CASCADE, related_name='rentals', null=True, blank=True)
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rentals', null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rentals')
+
     rental_start_date = models.DateField()
     rental_end_date = models.DateField()
     total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
@@ -74,8 +76,13 @@ class Rental(models.Model):
             self.rental_end_date = datetime.strptime(self.rental_end_date, '%Y-%m-%d').date()
 
         rental_days = (self.rental_end_date - self.rental_start_date).days
+
         if rental_days > 0:
-            self.total_price = rental_days * self.car.price_per_day
+            if self.car:
+                self.total_price = rental_days * self.car.price_per_day
+            if self.hotel:
+                self.total_price = rental_days * self.hotel.price_per_night
+
 
         super().save(*args, **kwargs)
 
@@ -99,8 +106,9 @@ class Flight(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            slug = slugify(f"{self.airline}-{self.flight_number}")
+            self.slug = slugify(f"{self.airline}-{self.flight_number}")
         super().save(*args, **kwargs)
+
 
 class Ticket(models.Model):
     flight = ForeignKey(Flight, on_delete=models.CASCADE)

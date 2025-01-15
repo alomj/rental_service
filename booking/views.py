@@ -9,8 +9,8 @@ from django.views import View
 from django.views.generic import TemplateView
 from weasyprint import HTML
 
-from .forms import BuyTicketForm, CarRentalForm
-from .models import Flight, Ticket, Car
+from .forms import BuyTicketForm, CarRentalForm, HotelRentalForm
+from .models import Flight, Ticket, Car, Hotel
 
 
 class FlightView(LoginRequiredMixin, View):
@@ -33,7 +33,8 @@ class FlightView(LoginRequiredMixin, View):
 class TicketView(View):
     def get(self, request, flight_slug, ticket_id):
         ticket = get_object_or_404(Ticket, flight__slug=flight_slug, id=ticket_id)
-        return render(request, 'booking/flight/success_ticket.html', {'ticket': ticket, 'flight': ticket.flight})
+        return render(request, 'booking/flight/success_ticket.html', {'ticket': ticket,
+                                                                      'flight': ticket.flight})
 
 
 class TicketPDFView(View):
@@ -101,7 +102,7 @@ class CarRent(LoginRequiredMixin, View):
             request.session['rental_end_date'] = str(rental_end_date)
             request.session['total_price'] = str(total_price)
 
-            return render(request, 'booking/car/car_successful.html', {
+            return render(request, 'booking/car/car_succesful.html', {
                 'car': car,
                 'rental_start_date': rental_start_date,
                 'rental_end_date': rental_end_date,
@@ -123,6 +124,70 @@ class CarSuccessfulRent(LoginRequiredMixin, View):
             'car': car,
             'rental_start_date': rental_start_date,
             'rental_end_date': rental_end_date,
+            'total_price': total_price
+        })
+
+
+class HotelList(LoginRequiredMixin, View):
+    def get(self, request):
+        hotel = Hotel.objects.all()
+
+        query = request.GET.get('q', ' ')
+        if query:
+            hotel = hotel.filter(
+                Q(name__icontains=query) | Q(location__icontains=query) |
+                Q(name__icontains=query) & Q(location__icontains=query)
+            )
+
+        paginator = Paginator(hotel, 9)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        return render(request, 'booking/hotel/hotel_list.html', {'hotel': page_obj, 'query': query})
+
+class HotelRent(LoginRequiredMixin, View):
+    def get(self, request, hotel_slug):
+        hotel = get_object_or_404(Hotel, slug=hotel_slug)
+        form = HotelRentalForm(hotel=hotel)
+        return render(request, 'booking/hotel/hotel_rent.html', {'hotel': hotel, 'form': form})
+
+    def post(self, request, hotel_slug):
+        hotel = get_object_or_404(Hotel, slug=hotel_slug)
+        form = HotelRentalForm(request.POST, hotel=hotel)
+        if form.is_valid():
+            rental = form.save(commit=False)
+            rental.hotel = hotel
+            rental.user = request.user
+            arrival_date = form.cleaned_data['arrival_date']
+            departure_date = form.cleaned_data['departure_date']
+            total_price = form.cleaned_data['total_price']
+
+            rental.save()
+            request.session['arrival_date'] = str(arrival_date)
+            request.session['departure_date'] = str(departure_date)
+            request.session['total_price'] = str(total_price)
+
+            return render(request, 'booking/hotel/hotel_succesful.html', {
+                'hotel': hotel,
+                'arrival_date': arrival_date,
+                'departure_date': departure_date,
+                'total_price': total_price
+            })
+        return render(request, 'booking/hotel/hotel_rent.html', {'hotel': hotel, 'form': form})
+
+
+class HotelSuccessfulRent(LoginRequiredMixin, View):
+    def get(self, request, hotel_slug, hotel_id):
+        hotel = get_object_or_404(Hotel,slug=hotel_slug, id=hotel_id)
+
+        arrival_date = request.session.get('arrival_date')
+        departure_date = request.session.get('departure_date')
+        total_price = request.session.get('total_price')
+
+        return render(request, 'booking/hotel/hotel_ticket.html', {
+            'hotel_id': hotel_id,
+            'hotel': hotel,
+            'arrival_date': arrival_date,
+            'departure_date': departure_date,
             'total_price': total_price
         })
 
