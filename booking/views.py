@@ -67,7 +67,14 @@ class BuyTicketView(View):
             ticket = form.save(commit=False)
             ticket.flight = flight
             ticket.save()
+
+            Booking.objects.create(
+                flight=flight,
+                created_by=request.user,
+                status=BookingStatus.ACTIVE
+            )
             return redirect('show_ticket', flight_slug=flight.slug, ticket_id=ticket.id)
+
         return render(request, 'booking/flight/buy_ticket.html', {'flight': flight, 'form': form})
 
 
@@ -104,6 +111,12 @@ class CarRent(LoginRequiredMixin, View):
             rental_start_date = form.cleaned_data['rental_start_date']
             rental_end_date = form.cleaned_data['rental_end_date']
             total_price = form.cleaned_data['total_price']
+
+            Booking.objects.create(
+                car=car,
+                created_by=request.user,
+                status=BookingStatus.ACTIVE
+            )
 
             rental.save()
             request.session['rental_start_date'] = str(rental_start_date)
@@ -154,6 +167,7 @@ class HotelList(LoginRequiredMixin, View):
         page_obj = paginator.get_page(page_number)
         return render(request, 'booking/hotel/hotel_list.html', {'hotel': page_obj, 'query': query})
 
+
 class HotelRent(LoginRequiredMixin, View):
     @staticmethod
     def get(request, hotel_slug):
@@ -173,6 +187,12 @@ class HotelRent(LoginRequiredMixin, View):
             departure_date = form.cleaned_data['departure_date']
             total_price = form.cleaned_data['total_price']
 
+            Booking.objects.create(
+                hotel=hotel,
+                created_by=request.user,
+                status=BookingStatus.ACTIVE
+            )
+
             rental.save()
             request.session['arrival_date'] = str(arrival_date)
             request.session['departure_date'] = str(departure_date)
@@ -190,7 +210,7 @@ class HotelRent(LoginRequiredMixin, View):
 class HotelSuccessfulRent(LoginRequiredMixin, View):
     @staticmethod
     def get(request, hotel_slug, hotel_id):
-        hotel = get_object_or_404(Hotel,slug=hotel_slug, id=hotel_id)
+        hotel = get_object_or_404(Hotel, slug=hotel_slug, id=hotel_id)
 
         arrival_date = request.session.get('arrival_date')
         departure_date = request.session.get('departure_date')
