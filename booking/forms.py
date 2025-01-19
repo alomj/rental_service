@@ -111,7 +111,3 @@ class HotelRentalForm(forms.ModelForm):
     class Meta:
         model = Rental
         fields = ['arrival_date', 'departure_date']
-
-    class Meta:
-        model = Rental
-        fields = ['arrival_date', 'departure_date']

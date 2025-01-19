@@ -14,7 +14,8 @@ from .models import Flight, Ticket, Car, Hotel
 
 
 class FlightView(LoginRequiredMixin, View):
-    def get(self, request):
+    @staticmethod
+    def get(request):
         flights = Flight.objects.all().order_by('flight_number')
         query = request.GET.get('q', ' ')
 
@@ -31,14 +32,16 @@ class FlightView(LoginRequiredMixin, View):
 
 
 class TicketView(View):
-    def get(self, request, flight_slug, ticket_id):
+    @staticmethod
+    def get(request, flight_slug, ticket_id):
         ticket = get_object_or_404(Ticket, flight__slug=flight_slug, id=ticket_id)
         return render(request, 'booking/flight/success_ticket.html', {'ticket': ticket,
                                                                       'flight': ticket.flight})
 
 
 class TicketPDFView(View):
-    def get(self, request, flight_slug, ticket_id):
+    @staticmethod
+    def get(request, flight_slug, ticket_id):
         ticket = get_object_or_404(Ticket, flight__slug=flight_slug, id=ticket_id)
         html_content = render_to_string('booking/flight/ticket_template.html', {'ticket': ticket})
 
@@ -50,12 +53,14 @@ class TicketPDFView(View):
 
 
 class BuyTicketView(View):
-    def get(self, request, flight_slug):
+    @staticmethod
+    def get(request, flight_slug):
         flight = get_object_or_404(Flight, slug=flight_slug)
         form = BuyTicketForm()
         return render(request, 'booking/flight/buy_ticket.html', {'flight': flight, 'form': form})
 
-    def post(self, request, flight_slug):
+    @staticmethod
+    def post(request, flight_slug):
         flight = get_object_or_404(Flight, slug=flight_slug)
         form = BuyTicketForm(request.POST)
         if form.is_valid():
@@ -67,7 +72,8 @@ class BuyTicketView(View):
 
 
 class CarView(LoginRequiredMixin, View):
-    def get(self, request):
+    @staticmethod
+    def get(request):
         cars = Car.objects.all().order_by('model')
         query = request.GET.get('q', ' ')
         if query:
@@ -81,12 +87,14 @@ class CarView(LoginRequiredMixin, View):
 
 
 class CarRent(LoginRequiredMixin, View):
-    def get(self, request, car_slug):
+    @staticmethod
+    def get(request, car_slug):
         car = get_object_or_404(Car, slug=car_slug)
         form = CarRentalForm(car=car)
         return render(request, 'booking/car/car_rent.html', {'car': car, 'form': form})
 
-    def post(self, request, car_slug):
+    @staticmethod
+    def post(request, car_slug):
         car = get_object_or_404(Car, slug=car_slug)
         form = CarRentalForm(request.POST, car=car)
         if form.is_valid():
@@ -112,7 +120,8 @@ class CarRent(LoginRequiredMixin, View):
 
 
 class CarSuccessfulRent(LoginRequiredMixin, View):
-    def get(self, request, car_id):
+    @staticmethod
+    def get(request, car_id):
         car = get_object_or_404(Car, id=car_id)
 
         rental_start_date = request.session.get('rental_start_date')
@@ -129,7 +138,8 @@ class CarSuccessfulRent(LoginRequiredMixin, View):
 
 
 class HotelList(LoginRequiredMixin, View):
-    def get(self, request):
+    @staticmethod
+    def get(request):
         hotel = Hotel.objects.all()
 
         query = request.GET.get('q', ' ')
@@ -145,12 +155,14 @@ class HotelList(LoginRequiredMixin, View):
         return render(request, 'booking/hotel/hotel_list.html', {'hotel': page_obj, 'query': query})
 
 class HotelRent(LoginRequiredMixin, View):
-    def get(self, request, hotel_slug):
+    @staticmethod
+    def get(request, hotel_slug):
         hotel = get_object_or_404(Hotel, slug=hotel_slug)
         form = HotelRentalForm(hotel=hotel)
         return render(request, 'booking/hotel/hotel_rent.html', {'hotel': hotel, 'form': form})
 
-    def post(self, request, hotel_slug):
+    @staticmethod
+    def post(request, hotel_slug):
         hotel = get_object_or_404(Hotel, slug=hotel_slug)
         form = HotelRentalForm(request.POST, hotel=hotel)
         if form.is_valid():
@@ -176,7 +188,8 @@ class HotelRent(LoginRequiredMixin, View):
 
 
 class HotelSuccessfulRent(LoginRequiredMixin, View):
-    def get(self, request, hotel_slug, hotel_id):
+    @staticmethod
+    def get(request, hotel_slug, hotel_id):
         hotel = get_object_or_404(Hotel,slug=hotel_slug, id=hotel_id)
 
         arrival_date = request.session.get('arrival_date')
@@ -258,7 +271,8 @@ class BookingViewSet(viewsets.ModelViewSet):
         serializer.save(created_by=request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def validate_update(self, instance):
+    @staticmethod
+    def validate_update(instance):
         if instance.status == BookingStatus.CANCELLED:
             raise ValidationError({"detail": "Cannot update a cancelled booking."})
 

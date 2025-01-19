@@ -30,11 +30,13 @@ def profile(request):
 
 
 class EditProfileView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
+    @staticmethod
+    def get(request, *args, **kwargs):
         form = UserEditProfileForm(instance=request.user)
         return render(request, 'user/edit_profile.html', {'form': form})
 
-    def post(self, request, *args, **kwargs):
+    @staticmethod
+    def post(request, *args, **kwargs):
         form = UserEditProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()

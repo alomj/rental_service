@@ -1,8 +1,9 @@
-from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import (CustomTokenObtainView, CustomRefreshTokenView, logout, is_authenticated, home_view,
-                    login_view, register_api, register, logout_view, logout_redirect_view, profile, EditProfileView)
+from django.urls import path
+
+from .views import (CustomTokenObtainView, CustomRefreshTokenView, is_authenticated, home_view,
+                    login_view, register_api, register, logout_redirect_view, profile, EditProfileView)
 
 urlpatterns = [
     path('login/token/home/', home_view, name='home_view'),
@@ -15,10 +16,10 @@ urlpatterns = [
     path('home/', home_view, name='home'),
     path('login/', login_view, name='login'),
     path('register/', register, name='register'),
-    path('logout/', logout_redirect_view, name = 'logout_view'),
-    path('profile/', profile, name = 'profile'),
-    path('profile/edit/', EditProfileView.as_view(), name='edit_profile')
-
+    path('logout/', logout_redirect_view, name='logout_view'),
+    path('profile/', profile, name='profile'),
+    path('profile/edit/', EditProfileView.as_view(), name='edit_profile'),
 ]
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
