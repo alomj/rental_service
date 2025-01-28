@@ -2,6 +2,7 @@ from django.shortcuts import redirect
 from django.utils.deprecation import MiddlewareMixin
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.http import JsonResponse
 
 class TokenRefreshMiddleware(MiddlewareMixin):
     def process_request(self, request):
@@ -11,9 +12,10 @@ class TokenRefreshMiddleware(MiddlewareMixin):
             '/register_api/',
             '/static/',
             '/api/register_api/',
-            '/logout'
+            '/logout',
         ]
 
+        # Пропускаємо виключені шляхи
         if any(request.path.startswith(path) for path in excluded_paths):
             return None
 
@@ -28,10 +30,10 @@ class TokenRefreshMiddleware(MiddlewareMixin):
                 request.META['HTTP_AUTHORIZATION'] = f'Bearer {new_access_token}'
                 request.access_token_refreshed = True
             except AuthenticationFailed:
-                return redirect('/login/')
-
-        elif not access_token and not refresh_token:
-            return redirect('/login/')
+                if request.path.startswith('/api/'):
+                    return JsonResponse({'error': 'Invalid refresh token'}, status=401)
+                else:
+                    return redirect('/login/')
 
         return None
 
@@ -43,7 +45,7 @@ class TokenRefreshMiddleware(MiddlewareMixin):
                 value=access_token,
                 httponly=True,
                 secure=True,
-                samesite='None',
+                samesite='Strict',
                 path='/'
             )
         return response

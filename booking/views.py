@@ -193,100 +193,31 @@ class HotelRent(LoginRequiredMixin, View):
 
         form = HotelRentalForm(request.POST, hotel=hotel)
         if form.is_valid():
-            logger.info("Form is valid")
-            external_api_url = 'http://127.0.0.1:8000/api/bookings/'
+            rental = form.save(commit=False)
+            rental.hotel = hotel
+            rental.user = request.user
             arrival_date = form.cleaned_data['arrival_date']
             departure_date = form.cleaned_data['departure_date']
             total_price = form.cleaned_data['total_price']
-            logger.info(f"Form data - Arrival: {arrival_date}, Departure: {departure_date}, Total Price: {total_price}")
 
-            access_token = request.COOKIES.get('access_token')
-            logger.info(f"Access token from cookies: {access_token}")
+            Booking.objects.create(
+                hotel=hotel,
+                created_by=request.user,
+                status=BookingStatus.ACTIVE
+            )
 
+            rental.save()
             request.session['arrival_date'] = str(arrival_date)
             request.session['departure_date'] = str(departure_date)
             request.session['total_price'] = str(total_price)
 
-            if not access_token:
-                logger.warning("Access token not found, redirecting to login")
-                return redirect(reverse('login'))
-
-            data = {
-                'hotel': hotel.id,
-                'arrival_date': arrival_date.isoformat(),
-                'departure_date': departure_date.isoformat(),
-                'total_price': float(total_price),
-            }
-            headers = {
-                "Authorization": f"Bearer {access_token}",
-                "Content-Type": "application/json",
-            }
-            logger.info(f"Sending POST request to external API: {external_api_url}")
-            logger.info(f"Data: {data}")
-            logger.info(f"Headers: {headers}")
-
-            try:
-                response = requests.post(external_api_url, json=data, headers=headers)
-                logger.info(f"API response status code: {response.status_code}")
-                logger.info(f"API response content: {response.text}")
-
-                if response.status_code == 201:
-                    booking_data = response.json()
-                    logger.info(f"Booking created successfully: {booking_data}")
-                    return render(request, 'booking/hotel/hotel_succesful.html', {
-                        'hotel': hotel,
-                        'arrival_date': arrival_date,
-                        'departure_date': departure_date,
-                        'total_price': total_price,
-                        'booking_id': booking_data.get('id'),
-                    })
-                else:
-                    logger.error(f"Failed to create booking. Status code: {response.status_code}")
-                    return render(request, 'booking/hotel/hotel_rent.html', {
-                        'hotel': hotel,
-                        'form': form,
-                        'error': f"Failed to create booking: {response.status_code}, {response.text}",
-                    })
-            except Exception as e:
-                logger.exception(f"An error occurred during API request: {str(e)}")
-                return render(request, 'booking/hotel/hotel_rent.html', {
-                    'hotel': hotel,
-                    'form': form,
-                    'error': f"An error occurred: {str(e)}",
-                })
-        else:
-            logger.warning("Form is invalid")
-            logger.warning(f"Form errors: {form.errors}")
-
+            return render(request, 'booking/hotel/hotel_succesful.html', {
+                'hotel': hotel,
+                'arrival_date': arrival_date,
+                'departure_date': departure_date,
+                'total_price': total_price
+            })
         return render(request, 'booking/hotel/hotel_rent.html', {'hotel': hotel, 'form': form})
-
-
-
-        #     rental = form.save(commit=False)
-        #     rental.hotel = hotel
-        #     rental.user = request.user
-        #     arrival_date = form.cleaned_data['arrival_date']
-        #     departure_date = form.cleaned_data['departure_date']
-        #     total_price = form.cleaned_data['total_price']
-        #
-        #     Booking.objects.create(
-        #         hotel=hotel,
-        #         created_by=request.user,
-        #         status=BookingStatus.ACTIVE
-        #     )
-        #
-        #     rental.save()
-        #     request.session['arrival_date'] = str(arrival_date)
-        #     request.session['departure_date'] = str(departure_date)
-        #     request.session['total_price'] = str(total_price)
-        #
-        #     return render(request, 'booking/hotel/hotel_succesful.html', {
-        #         'hotel': hotel,
-        #         'arrival_date': arrival_date,
-        #         'departure_date': departure_date,
-        #         'total_price': total_price
-        #     })
-        # return render(request, 'booking/hotel/hotel_rent.html', {'hotel': hotel, 'form': form})
 
 
 class HotelSuccessfulRent(LoginRequiredMixin, View):
@@ -356,6 +287,8 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        print(f"User authenticated: {user.is_authenticated}")
+        print(f"User: {user}")
         if user.is_staff:
             return self.queryset
         if not isinstance(user, User):
@@ -368,6 +301,8 @@ class BookingViewSet(viewsets.ModelViewSet):
         return context
 
     def create(self, request, *args, **kwargs):
+        logger.info(f"BAuthorization header: {request.headers.get('Authorization')}")
+        logger.info(f"BUser: {request.user}")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(created_by=request.user)

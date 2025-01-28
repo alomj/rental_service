@@ -7,7 +7,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 router = DefaultRouter()
-router.register(r'bookings', BookingViewSet)
+router.register(r'bookings', BookingViewSet, basename='booking')
 
 urlpatterns = [
     # API paths

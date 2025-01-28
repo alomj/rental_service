@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
 
-from .views import (CustomTokenObtainView, CustomRefreshTokenView, is_authenticated, home_view,
+from .views import (CustomTokenObtainView, CustomRefreshTokenView, is_authenticated,  home_view,
                     login_view, register_api, register, logout_redirect_view, profile, EditProfileView)
 
 urlpatterns = [

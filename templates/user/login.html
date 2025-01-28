@@ -1,5 +1,4 @@
 {% extends "user/base.html" %}
-{% csrf_token %}
 {% block title %}Login{% endblock %}
 {% block content %}
     <div class="bg-white p-6 rounded-lg shadow-md w-full max-w-md mx-auto">
@@ -8,6 +7,7 @@
             <div class="text-red-500 text-sm">{{ errors }}</div>
         {% endif %}
         <form action="" method="post" class="space-y-4">
+            {% csrf_token %}
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             <input type="hidden" name="next" value="{{ request.GET.next }}">
             <div>
@@ -25,7 +25,5 @@
         <h2 class="text-l text-gray-700 text-right ">
             <a href={% url 'register' %} class="text-blue-600 hover:text-blue-800">Don’t have an account?</a>
         </h2>
-        <p>User: {{ user }}</p>
-        <p>Is authenticated: {{ user.is_authenticated }}</p>
     </div>
 {% endblock %}

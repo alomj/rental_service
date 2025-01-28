@@ -12,7 +12,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
+from booking.models import Booking
 from .forms import UserEditProfileForm
 
 User = get_user_model()
@@ -26,7 +26,9 @@ def home_view(request):
 
 @login_required
 def profile(request):
-    return render(request, 'user/profile.html')
+    user = request.user
+    bookings = Booking.objects.filter(created_by=user).order_by('-created_at')
+    return render(request, 'user/profile.html', {'user': user, 'bookings': bookings})
 
 
 class EditProfileView(LoginRequiredMixin, View):
@@ -102,7 +104,7 @@ def login_view(request):
                     value=access_token,
                     httponly=True,
                     secure=True,
-                    samesite='None',
+                    samesite='Strict',
                     path='/'
                 )
                 response.set_cookie(
@@ -110,7 +112,7 @@ def login_view(request):
                     value=refresh_token,
                     httponly=True,
                     secure=True,
-                    samesite='None',
+                    samesite='Strict',
                     path='/'
                 )
                 return response
@@ -132,7 +134,7 @@ class CustomTokenObtainView(TokenObtainPairView):
         try:
             response = super().post(request, *args, **kwargs)
 
-            # Отримуємо токени
+
             if response.status_code == 200:
                 token = response.data
                 access_token = token.get('access')
@@ -144,7 +146,7 @@ class CustomTokenObtainView(TokenObtainPairView):
                     value=access_token,
                     httponly=True,
                     secure=True,
-                    samesite='None',
+                    samesite='Strict',
                     path='/'
                 )
                 res.set_cookie(
@@ -152,7 +154,7 @@ class CustomTokenObtainView(TokenObtainPairView):
                     value=refresh_token,
                     httponly=True,
                     secure=True,
-                    samesite='None',
+                    samesite='Strict',
                     path='/'
                 )
                 return res
@@ -183,7 +185,7 @@ class CustomRefreshTokenView(TokenRefreshView):
                 value=access_token,
                 httponly=True,
                 secure=True,
-                samesite='None',
+                samesite='Strict',
                 path='/'
 
             )

@@ -4,50 +4,87 @@
 {% block title %}Profile{% endblock %}
 
 {% block content %}
-<div class="bg-white p-6 rounded-lg shadow-md mt-6">
-    <h1 class="text-3xl font-bold mb-4">My Profile</h1>
-    <div class="flex items-center mb-4">
-       
-        <div class="w-20 h-20 rounded-full bg-gray-300 mr-4 overflow-hidden">
-            {% if user.avatar %}
-                <img src="{{ user.avatar.url }}" alt="Avatar of {{ user.username }}" class="w-20 h-20 object-cover">
+    <div class="bg-white p-6 rounded-lg shadow-md mt-6">
+        <h1 class="text-3xl font-bold mb-4">My Profile</h1>
+        <div class="flex items-center mb-4">
+
+            <div class="w-20 h-20 rounded-full bg-gray-300 mr-4 overflow-hidden">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="Avatar of {{ user.username }}" class="w-20 h-20 object-cover">
+                {% else %}
+                    <img src="{% static 'images/default-avatar.jpg' %}" alt="Default avatar"
+                         class="w-20 h-20 object-cover">
+                {% endif %}
+            </div>
+
+            <div>
+                <h3 class="text-lg font-semibold">{{ user.username }}</h3>
+                <h3 class="text-gray-600">{{ user.email }}</h3>
+                {% if user.first_name or user.last_name %}
+                    <h3 class="text-gray-600">{{ user.first_name }} {{ user.last_name }}</h3>
+                {% endif %}
+                {% if user.date_of_birth %}
+                    <h3 class="text-gray-600">Date of Birth: {{ user.date_of_birth }}</h3>
+                {% endif %}
+            </div>
+        </div>
+        <div class="border-t mt-4 pt-4">
+            <h2 class="text-2xl font-bold mb-3">My Bookings</h2>
+            {% if bookings %}
+                <div class="h-96 overflow-y-auto space-y-4">
+                    {% for booking in bookings %}
+                        <div class="p-4 bg-gray-100 rounded-lg shadow hover:shadow-md transition">
+                            <h3 class="font-semibold text-lg mb-2">Booking ID: {{ booking.id }}</h3>
+                            <p class="text-sm text-gray-600">Date: {{ booking.created_at|date:"d M Y" }}</p>
+                            <p class="text-sm text-gray-600">Status: {{ booking.get_status_display }}</p>
+
+                            {% if booking.hotel %}
+                                <div class="mt-2">
+                                    <h4 class="font-semibold text-gray-800">Hotel</h4>
+                                    <p class="text-sm text-gray-600">Name: {{ booking.hotel.name }}</p>
+                                    <p class="text-sm text-gray-600">Location: {{ booking.hotel.location }}</p>
+                                </div>
+                            {% endif %}
+
+                            {% if booking.car %}
+                                <div class="mt-2">
+                                    <h4 class="font-semibold text-gray-800">Car</h4>
+                                    <p class="text-sm text-gray-600">Model: {{ booking.car.model }}
+                                        ({{ booking.car.year }})</p>
+                                    <p class="text-sm text-gray-600">
+                                        Class: {{ booking.car.get_class_of_car_display }}</p>
+                                </div>
+                            {% endif %}
+
+                            {% if booking.flight %}
+                                <div class="mt-2">
+                                    <h4 class="font-semibold text-gray-800">Flight</h4>
+                                    <p class="text-sm text-gray-600">Airline: {{ booking.flight.airline }}
+                                        ({{ booking.flight.flight_number }})</p>
+                                    <p class="text-sm text-gray-600">Route: {{ booking.flight.place_of_departure }}
+                                        → {{ booking.flight.destination }}</p>
+                                </div>
+                            {% endif %}
+
+                            <div class="mt-2">
+                                <h4 class="font-semibold text-gray-800">Summary</h4>
+                                <p class="text-sm text-gray-600">Total Price: ${{ booking.total_price }}</p>
+                                {% if booking.notes %}
+                                    <p class="text-sm text-gray-600">Notes: {{ booking.notes }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             {% else %}
-                <img src="{% static 'images/default-avatar.jpg' %}" alt="Default avatar" class="w-20 h-20 object-cover">
-            {% endif %}
-        </div>
-        
-        <div>
-            <h3 class="text-lg font-semibold">{{ user.username }}</h3>
-            <h3 class="text-gray-600">{{ user.email }}</h3>
-            {% if user.first_name or user.last_name %}
-                <h3 class="text-gray-600">{{ user.first_name }} {{ user.last_name }}</h3>
-            {% endif %}
-            {% if user.date_of_birth %}
-                <h3 class="text-gray-600">Date of Birth: {{ user.date_of_birth }}</h3>
+                <p class="text-gray-600">You have no bookings yet.</p>
             {% endif %}
         </div>
     </div>
-    <div class="border-t mt-4 pt-4">
-      
-        <h2 class="text-2xl font-bold mb-3">Booking History</h2>
-        {% if bookings %}
-            <ul class="space-y-4">
-                {% for booking in bookings %}
-                    <li class="border-b pb-3">
-                        <p class="font-semibold">Booking ID: {{ booking.id }}</p>
-                        <p class="text-gray-600">Date: {{ booking.date }}</p>
-                        <p class="text-gray-600">Details: {{ booking.details }}</p>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-gray-600">You have no bookings yet.</p>
-        {% endif %}
+    <div class="flex justify-end">
+        <a href="{% url 'edit_profile' %}"
+           class="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 inline-block">
+            Edit Profile
+        </a>
     </div>
-</div>
-<div class="flex justify-end">
-    <a href="{% url 'edit_profile' %}" class="px-4 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 inline-block">
-        Edit Profile
-    </a>
-</div>
 {% endblock %}

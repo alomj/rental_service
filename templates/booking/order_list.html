@@ -3,27 +3,33 @@
 
 {% block content %}
 <div class="bg-white p-6 rounded-lg shadow-md mt-6">
-    <h1 class="text-3xl font-bold mb-4">Booking List</h1>
-    {% if bookings %}
-        <ul class="space-y-4">
-            {% for booking in bookings %}
-                <li class="border-b pb-3">
-                    <p class="font-semibold">Booking ID: {{ booking.id }}</p>
-                    <p class="text-gray-600">Date: {{ booking.date }}</p>
-                    <p class="text-gray-600">Details: {{ booking.details }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p class="text-gray-600">No bookings available.</p>
-    {% endif %}
+    <h1 class="text-3xl font-bold mb-6 text-center">What are you interested in?</h1>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-gray-100 p-4 rounded-lg shadow-md text-center">
+            <h2 class="text-2xl font-bold mb-2">Cars</h2>
+            <p class="text-gray-600 mb-4">Rent cars for your trips with flexible options and affordable prices.</p>
+            <a href="{% url 'car_list' %}" 
+               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 inline-block">
+                View Cars
+            </a>
+        </div>
+        <div class="bg-gray-100 p-4 rounded-lg shadow-md text-center">
+            <h2 class="text-2xl font-bold mb-2">Flights</h2>
+            <p class="text-gray-600 mb-4">Book flights to your favorite destinations worldwide.</p>
+            <a href="{% url 'flights' %}" 
+               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 inline-block">
+                View Flights
+            </a>
+        </div>
+      
+        <div class="bg-gray-100 p-4 rounded-lg shadow-md text-center">
+            <h2 class="text-2xl font-bold mb-2">Hotels</h2>
+            <p class="text-gray-600 mb-4">Find and book the best hotels for your stay with exclusive deals.</p>
+            <a href="{% url 'hotel_list' %}" 
+               class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 inline-block">
+                View Hotels
+            </a>
+        </div>
+    </div>
 </div>
-<div class="flex justify-end mt-6">
-    <a href="?reloaded=true" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 inline-block">
-        Reload Data
-    </a>
-</div>
-{% if reloaded %}
-    <p class="text-green-600 mt-4">Data reloaded successfully!</p>
-{% endif %}
 {% endblock %}
