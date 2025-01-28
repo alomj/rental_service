@@ -287,8 +287,6 @@ class BookingViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        print(f"User authenticated: {user.is_authenticated}")
-        print(f"User: {user}")
         if user.is_staff:
             return self.queryset
         if not isinstance(user, User):
